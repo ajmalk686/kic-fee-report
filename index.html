@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Weekly Fee Payment Report</title>
+<link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+
+<header class="app-header">
+  <div class="app-header__brand">
+    <img src="assets/img/logo.png" alt="Kerala Islamic Centre logo" class="app-header__logo" />
+    <div>
+      <h1 class="app-header__title">Fee Payment Report</h1>
+      <p class="app-header__subtitle" id="schoolNameLabel">Kerala Islamic Centre - AL Wakra</p>
+    </div>
+  </div>
+
+  <div class="app-header__status">
+    <span id="statusPill" class="status-pill status-pill--loading">Loading…</span>
+    <span class="last-refreshed" id="lastRefreshed">Never refreshed</span>
+    <button id="remindAllBtn" class="btn btn--whatsapp" type="button">Remind All Pending</button>
+    <button id="refreshBtn" class="btn btn--primary" type="button">
+      <svg class="icon-refresh" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      Refresh
+    </button>
+  </div>
+</header>
+
+<div id="errorBanner" class="error-banner hidden"></div>
+
+<nav class="tab-nav" id="tabNav">
+  <button class="tab-nav__item is-active" data-tab="dashboard" type="button">Dashboard</button>
+  <button class="tab-nav__item" data-tab="classwise" type="button">Class&#8209;wise</button>
+  <button class="tab-nav__item" data-tab="monthwise" type="button">Month&#8209;wise</button>
+  <button class="tab-nav__item" data-tab="weekly" type="button">Weekly</button>
+  <button class="tab-nav__item" data-tab="students" type="button">All Students</button>
+</nav>
+
+<main class="app-main">
+
+  <!-- DASHBOARD -->
+  <section class="tab-panel is-active" id="tab-dashboard">
+    <div class="kpi-grid" id="kpiGrid"></div>
+    <div class="panel-grid">
+      <div class="card">
+        <h2 class="card__title">Collections by Month</h2>
+        <div id="monthChart" class="chart-host"></div>
+      </div>
+      <div class="card">
+        <h2 class="card__title">Pending by Class</h2>
+        <div id="classChart" class="chart-host"></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2 class="card__title">Recent Payments</h2>
+      <div class="table-scroll">
+        <table class="data-table" id="recentPaymentsTable"></table>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLASS-WISE -->
+  <section class="tab-panel" id="tab-classwise">
+    <div class="toolbar">
+      <select id="classSelect" class="input"></select>
+      <input type="search" id="classSearch" class="input input--grow" placeholder="Search student name, admission no or mobile…" />
+      <select id="classStatusFilter" class="input">
+        <option value="all">All students</option>
+        <option value="pending">Pending only</option>
+        <option value="paid">Fully paid</option>
+      </select>
+    </div>
+    <div class="card" id="classSummaryCard"></div>
+    <div class="card">
+      <div class="table-scroll">
+        <table class="data-table" id="classStudentsTable"></table>
+      </div>
+    </div>
+  </section>
+
+  <!-- MONTH-WISE -->
+  <section class="tab-panel" id="tab-monthwise">
+    <div class="card">
+      <div class="table-scroll">
+        <table class="data-table" id="monthSummaryTable"></table>
+      </div>
+    </div>
+    <div class="toolbar">
+      <select id="monthSelect" class="input"></select>
+      <select id="monthStatusFilter" class="input">
+        <option value="pending">Pending students</option>
+        <option value="paid">Paid students</option>
+        <option value="leave">On leave</option>
+      </select>
+      <select id="monthClassFilter" class="input">
+        <option value="all">All classes</option>
+      </select>
+    </div>
+    <div class="card">
+      <div class="table-scroll">
+        <table class="data-table" id="monthDetailTable"></table>
+      </div>
+    </div>
+  </section>
+
+  <!-- WEEKLY -->
+  <section class="tab-panel" id="tab-weekly">
+    <div class="toolbar toolbar--center">
+      <button id="weekPrevBtn" class="btn btn--ghost" type="button">&larr; Previous</button>
+      <div class="week-range" id="weekRangeLabel">—</div>
+      <button id="weekNextBtn" class="btn btn--ghost" type="button">Next &rarr;</button>
+      <button id="weekTodayBtn" class="btn btn--ghost" type="button">This week</button>
+    </div>
+    <div class="kpi-grid kpi-grid--compact" id="weekKpiGrid"></div>
+    <div class="card">
+      <h2 class="card__title">Payments this week</h2>
+      <div class="chart-host" id="weekChart"></div>
+    </div>
+    <div class="card">
+      <div class="table-scroll">
+        <table class="data-table" id="weekTable"></table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ALL STUDENTS -->
+  <section class="tab-panel" id="tab-students">
+    <div class="toolbar">
+      <input type="search" id="studentSearch" class="input input--grow" placeholder="Search by name, admission no, class or mobile…" />
+      <select id="studentClassFilter" class="input">
+        <option value="all">All classes</option>
+      </select>
+      <select id="studentStatusFilter" class="input">
+        <option value="all">All students</option>
+        <option value="pending">Pending only</option>
+        <option value="paid">Fully paid</option>
+      </select>
+    </div>
+    <div class="card">
+      <div class="table-scroll">
+        <table class="data-table" id="allStudentsTable"></table>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div id="toast" class="toast hidden"></div>
+
+<!-- Edit mobile numbers modal -->
+<div class="modal-overlay hidden" id="mobileModalOverlay">
+  <div class="modal">
+    <div class="modal__header">
+      <h3 id="mobileModalTitle">Mobile numbers</h3>
+      <button class="modal__close" data-close-modal type="button" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal__body">
+      <div id="mobileModalSheetNumbers"></div>
+      <div id="mobileModalLocalNumbers"></div>
+      <form id="mobileAddForm" class="mobile-add-form">
+        <input type="tel" id="mobileAddInput" class="input input--grow" placeholder="Add a mobile number (8 digits)" />
+        <button type="submit" class="btn btn--primary">Add</button>
+      </form>
+      <p class="modal__hint">Numbers added here are saved only in this browser (not written back to the Google Sheet). For a permanent fix, also update the sheet.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Bulk / class-wise reminder queue modal -->
+<div class="modal-overlay hidden" id="reminderModalOverlay">
+  <div class="modal modal--wide">
+    <div class="modal__header">
+      <h3 id="reminderModalTitle">Remind students</h3>
+      <button class="modal__close" data-close-modal type="button" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal__body">
+      <p class="modal__hint">WhatsApp has no bulk-send link - click each Remind button below, then tap Send in WhatsApp. Work down the list one at a time.</p>
+      <div class="table-scroll">
+        <table class="data-table" id="reminderQueueTable"></table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/sheetClient.js"></script>
+<script src="assets/js/parse.js"></script>
+<script src="assets/js/compute.js"></script>
+<script src="assets/js/overrides.js"></script>
+<script src="assets/js/whatsapp.js"></script>
+<script src="assets/js/charts.js"></script>
+<script src="assets/js/render.js"></script>
+<script src="assets/js/modals.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>
